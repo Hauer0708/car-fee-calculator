@@ -312,6 +312,9 @@
   function calc(){
     const cc = document.getElementById('cc').value;
     const fuel = document.getElementById('fuel').value;
+      // 事件綁定
+  document.getElementById('calcBtn').addEventListener('click', calc);
+  document.getElementById('fuel').addEventListener('change', syncFuelUI);
 
     const range = getRange();
     if(!range){
@@ -389,10 +392,6 @@ const total = plate + fuelFee + REG_FEE + pickno + bidAmount;
 結果：總額約 NT$ ${fmt(total)}
 
 想請你幫我確認實際費用/是否有退補稅差額。`;
-
-  // 事件綁定
-  document.getElementById('calcBtn').addEventListener('click', calc);
-  document.getElementById('fuel').addEventListener('change', syncFuelUI);
 
 // 加選項目（二選一）：顯示 / 隱藏競標金額
 document.querySelectorAll('input[name="addon"]').forEach(radio => {
