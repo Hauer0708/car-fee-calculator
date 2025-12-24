@@ -119,10 +119,22 @@
 
       <div class="sep"></div>
 
-     <label>4｜加選項目</label>
+<label>4｜加選項目</label>
 <div class="chips">
-  <label class="chip"><input id="pickno" type="checkbox"> 車牌自費選號（2,000）</label>
-  <label class="chip"><input id="bidToggle" type="checkbox"> 號牌競標</label>
+  <label class="chip">
+    <input type="radio" name="addon" value="none" checked>
+    不加選項
+  </label>
+
+  <label class="chip">
+    <input type="radio" name="addon" value="pickno">
+    車牌自費選號（2,000）
+  </label>
+
+  <label class="chip">
+    <input type="radio" name="addon" value="bid">
+    號牌競標
+  </label>
 </div>
 
 <div id="bidBox" class="soft" style="display:none;">
@@ -384,15 +396,16 @@ const total = plate + fuelFee + REG_FEE + pickno + bidAmount;
   document.getElementById('calcBtn').addEventListener('click', calc);
   document.getElementById('fuel').addEventListener('change', syncFuelUI);
 
-// 號牌競標：顯示/隱藏金額輸入
-const bidToggleEl = document.getElementById('bidToggle');
-if (bidToggleEl) {
-  bidToggleEl.addEventListener('change', () => {
-    const box = document.getElementById('bidBox');
-    if (!box) return;
-    box.style.display = bidToggleEl.checked ? 'block' : 'none';
+// 加選項目（二選一）：顯示 / 隱藏競標金額
+document.querySelectorAll('input[name="addon"]').forEach(radio => {
+  radio.addEventListener('change', () => {
+    const bidBox = document.getElementById('bidBox');
+    if (!bidBox) return;
+
+    bidBox.style.display =
+      (radio.value === 'bid' && radio.checked) ? 'block' : 'none';
   });
-}
+});
   
   document.querySelectorAll('input[name="caseType"]').forEach(r => r.addEventListener('change', () => {
     syncBlocks();
