@@ -39,10 +39,12 @@
       </div>
 
       <label>0｜辦理類型</label>
-      <div class="chips">
-        <label class="chip"><input type="radio" name="caseType" value="new" checked> 新領牌 / 新車</label>
-        <label class="chip"><input type="radio" name="caseType" value="transfer"> 過戶 / 中古車</label>
-      </div>
+<div class="chips">
+  <label class="chip">
+    <input type="radio" checked>
+    新領牌 / 一般車
+  </label>
+</div>
 
       <div id="ccBlock">
         <label>1｜排氣量（cc）</label>
@@ -80,43 +82,54 @@
 
       <label>3｜計算期間</label>
 
-      <!-- 新領牌：整年 / 自選 -->
-      <div id="newPeriodBlock">
-        <div class="chips">
-          <label class="chip"><input type="radio" name="periodNew" value="full" checked> 整年</label>
-          <label class="chip"><input type="radio" name="periodNew" value="custom"> 自選日期</label>
-        </div>
-        <div class="row" id="dateRowNew" style="display:none;">
-          <div>
-            <label>起日</label>
-            <input id="startNew" type="date" />
-          </div>
-          <div>
-            <label>迄日</label>
-            <input id="endNew" type="date" />
-          </div>
-        </div>
-      </div>
+     <label>3｜計算期間</label>
 
-      <!-- 過戶/中古：用過戶日→到年底（可改） -->
-      <div id="transferPeriodBlock" style="display:none;">
-        <div class="muted" style="margin-top:8px;">
-          過戶/中古車建議：填「過戶日」，系統會預設算到「今年 12/31」（你也可自行調整）。
-        </div>
-        <div class="row" id="dateRowTransfer">
-          <div>
-            <label>過戶日（起日）</label>
-            <input id="startTransfer" type="date" />
-          </div>
-          <div>
-            <label>迄日（預設年底）</label>
-            <input id="endTransfer" type="date" />
-          </div>
-        </div>
-      </div>
+<!-- 新領牌：整年 / 自選 -->
+<div id="newPeriodBlock">
+  <div class="chips">
+    <label class="chip">
+      <input type="radio" name="periodNew" value="full" checked>
+      整年
+    </label>
+    <label class="chip">
+      <input type="radio" name="periodNew" value="custom">
+// 自選日期顯示 / 隱藏 + 預設日期
+function syncNewDateRow(){
+  const checked = document.querySelector('input[name="periodNew"]:checked');
+  if (!checked) return;
 
-      <div class="sep"></div>
+  const show = (checked.value === "custom");
+  const row = document.getElementById('dateRowNew');
+  if (!row) return;
 
+  row.style.display = show ? "grid" : "none";
+
+  // ⭐ 自選日期時，自動填：今天 ～ 12/31（只在空白時）
+  if (show) {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+
+    const today = `${y}-${m}-${d}`;
+    const yearEnd = `${y}-12-31`;
+
+    const startEl = document.getElementById('startNew');
+    const endEl = document.getElementById('endNew');
+
+    if (startEl && !startEl.value) startEl.value = today;
+    if (endEl && !endEl.value) endEl.value = yearEnd;
+  }
+}
+
+// 綁定 radio 切換
+document.querySelectorAll('input[name="periodNew"]').forEach(radio => {
+  radio.addEventListener('change', syncNewDateRow);
+});
+
+// 頁面載入時先跑一次
+syncNewDateRow();
+      
       <label>4｜加選項目</label>
       <div class="chips">
         <label class="chip"><input id="pickno" type="checkbox"> 車牌自費選號（2,000）</label>
