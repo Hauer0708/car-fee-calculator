@@ -119,10 +119,17 @@
 
       <div class="sep"></div>
 
-      <label>4｜加選項目</label>
-      <div class="chips">
-        <label class="chip"><input id="pickno" type="checkbox"> 車牌自費選號（2,000）</label>
-      </div>
+     <label>4｜加選項目</label>
+<div class="chips">
+  <label class="chip"><input id="pickno" type="checkbox"> 車牌自費選號（2,000）</label>
+  <label class="chip"><input id="bidToggle" type="checkbox"> 號牌競標</label>
+</div>
+
+<div id="bidBox" class="soft" style="display:none;">
+  <label style="margin-top:0;">競標金額（元）</label>
+  <input id="bidAmount" type="number" inputmode="numeric" placeholder="自行輸入金額（例如 80000）" />
+  <div class="hint" style="margin-top:6px;">※ 競標金額依個案不同，這裡先做加總估算</div>
+</div>
 
       <button id="calcBtn">輸入資料，即算規費</button>
       <a id="shareBtn" class="btn" href="#" target="_blank" rel="noopener">把結果傳給 Hauer 詢問</a>
@@ -324,9 +331,25 @@
 
     const plate = plateYear * pr.factor;
     const fuelFee = fuelYear * pr.factor;
+    // 加選項目
+// 加選項目
+const pickno = document.getElementById('pickno').checked ? PICKNO_FEE : 0;
 
-    const pickno = document.getElementById('pickno').checked ? PICKNO_FEE : 0;
-    const total = plate + fuelFee + REG_FEE + pickno;
+// 號牌競標（可為 0）
+let bidAmount = 0;
+const bidToggle = document.getElementById('bidToggle');
+const bidInput = document.getElementById('bidAmount');
+if (bidToggle && bidToggle.checked) {
+  bidAmount = Number((bidInput && bidInput.value) ? bidInput.value : 0);
+}
+
+// 防呆：勾選競標但沒填金額
+if (bidToggle && bidToggle.checked && bidAmount <= 0) {
+  alert("你勾選了號牌競標，請輸入競標金額");
+  return;
+}
+
+const total = plate + fuelFee + REG_FEE + pickno + bidAmount;
 
     // 顯示結果
     document.getElementById('total').textContent = `NT$ ${fmt(total)}`;
@@ -338,6 +361,7 @@
       <div><span>燃料使用費</span><span>NT$ ${fmt(fuelFee)}（年額 ${fmt(fuelYear)}）</span></div>
       <div><span>領牌規費</span><span>NT$ ${fmt(REG_FEE)}</span></div>
       <div><span>自費選號</span><span>NT$ ${fmt(pickno)}</span></div>
+      ${bidAmount > 0 ? `<div><span>號牌競標</span><span>NT$ ${fmt(bidAmount)}</span></div>` : ``}
     `;
 
     // 分享文字
@@ -347,6 +371,7 @@
 燃料：${fuel==="gas"?"汽油":fuel==="diesel"?"柴油":"純電動"}
 排氣量：${fuel==="ev"?"（純電動不適用）":cc+" cc"}
 期間：${periodLabel}
+號牌競標：${bidAmount > 0 ? `NT$ ${fmt(bidAmount)}` : `無`}
 結果：總額約 NT$ ${fmt(total)}
 
 想請你幫我確認實際費用/是否有退補稅差額。`;
@@ -359,6 +384,16 @@
   document.getElementById('calcBtn').addEventListener('click', calc);
   document.getElementById('fuel').addEventListener('change', syncFuelUI);
 
+// 號牌競標：顯示/隱藏金額輸入
+const bidToggleEl = document.getElementById('bidToggle');
+if (bidToggleEl) {
+  bidToggleEl.addEventListener('change', () => {
+    const box = document.getElementById('bidBox');
+    if (!box) return;
+    box.style.display = bidToggleEl.checked ? 'block' : 'none';
+  });
+}
+  
   document.querySelectorAll('input[name="caseType"]').forEach(r => r.addEventListener('change', () => {
     syncBlocks();
     syncNewDateRow();
