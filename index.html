@@ -1,110 +1,349 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>汽車規費試算｜Hauer</title>
-<style>
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",Arial;margin:0;background:#f6f7f9;}
-.wrap{max-width:560px;margin:0 auto;padding:16px;}
-.card{background:#fff;border-radius:16px;padding:16px;box-shadow:0 6px 20px rgba(0,0,0,.06);}
-label{font-size:13px;display:block;margin-top:12px;}
-input,select{width:100%;padding:12px;border-radius:12px;border:1px solid #d9dde3;font-size:16px;}
-.chips{display:flex;gap:10px;flex-wrap:wrap;}
-.chip{border:1px solid #d9dde3;border-radius:999px;padding:10px 12px;display:flex;gap:6px;align-items:center;}
-button{width:100%;margin-top:12px;padding:12px;border-radius:12px;border:0;background:#111;color:#fff;font-weight:800;}
-a.btn{display:block;width:100%;margin-top:12px;padding:12px;border-radius:12px;background:#06c755;color:#fff;text-align:center;font-weight:800;text-decoration:none;}
-.result{margin-top:14px;background:#f2f4f7;border-radius:12px;padding:12px;}
-.big{font-size:22px;font-weight:800;}
-.table div{display:flex;justify-content:space-between;font-size:13px;margin-top:6px;}
-.hint{font-size:12px;color:#777;margin-top:4px;}
-.error{font-size:12px;color:#c62828;margin-top:4px;}
-.soft{background:#f8fafc;border:1px dashed #d9dde3;padding:10px 12px;border-radius:12px;margin-top:10px;}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>汽車規費試算｜Hauer</title>
+  <style>
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",Arial; margin:0; background:#f6f7f9;}
+    .wrap{max-width:560px; margin:0 auto; padding:16px;}
+    .card{background:#fff; border-radius:16px; padding:16px; box-shadow:0 6px 20px rgba(0,0,0,.06);}
+    h1{font-size:18px; margin:0 0 10px;}
+    .muted{color:#555; font-size:13px; line-height:1.55;}
+    label{display:block; font-size:13px; margin:12px 0 6px; color:#333;}
+    input,select{width:100%; padding:12px; border-radius:12px; border:1px solid #d9dde3; font-size:16px; outline:none; box-sizing:border-box;}
+    .row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+    .chips{display:flex; gap:10px; flex-wrap:wrap;}
+    .chip{display:flex; align-items:center; gap:8px; border:1px solid #d9dde3; border-radius:999px; padding:10px 12px; cursor:pointer; user-select:none;}
+    .chip input{width:auto; padding:0; margin:0;}
+    .result{margin-top:14px; padding:12px; background:#f2f4f7; border-radius:12px;}
+    .big{font-size:22px; font-weight:800; margin:6px 0;}
+    button{display:block; width:100%; border:0; padding:12px; border-radius:12px; font-size:16px; font-weight:800; margin-top:12px; cursor:pointer; background:#111; color:#fff;}
+    a.btn{display:block; width:100%; border:0; padding:12px; border-radius:12px; font-size:16px; font-weight:800; margin-top:12px; cursor:pointer; text-align:center; text-decoration:none; background:#06c755; color:#fff; box-sizing:border-box;}
+    .sep{height:1px; background:#edf0f4; margin:14px 0;}
+    .table{font-size:13px; color:#333; line-height:1.7;}
+    .table div{display:flex; justify-content:space-between; gap:12px;}
+    .hint{font-size:12px; color:#666; margin-top:10px;}
+    .pill{display:inline-block; padding:4px 10px; border-radius:999px; background:#eef2ff; color:#1f3a8a; font-size:12px; font-weight:700;}
+    .soft{background:#f8fafc; border:1px dashed #d9dde3; padding:10px 12px; border-radius:12px; margin-top:10px;}
+  </style>
 </head>
 
 <body>
-<div class="wrap">
-<div class="card">
+  <div class="wrap">
+    <div class="card">
+      <h1>汽車規費試算 <span class="pill">自用小客車</span></h1>
+      <div class="muted">
+        估算：使用牌照稅 + 燃料使用費 + 領牌規費（可選加：選號費）<br>
+        ※ 過戶/中古車可能受「已繳狀況/退補稅」影響，本頁以你輸入期間做比例估算，實際以機關核定為準。
+      </div>
 
-<label>4｜加選項目</label>
-<div class="chips">
-  <label class="chip"><input id="pickno" type="checkbox"> 車牌選號（2,000）</label>
-  <label class="chip"><input id="bidToggle" type="checkbox"> 號牌競標</label>
-</div>
+      <label>0｜辦理類型</label>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="caseType" value="new" checked> 新領牌 / 新車</label>
+        <label class="chip"><input type="radio" name="caseType" value="transfer"> 過戶 / 中古車</label>
+      </div>
 
-<div id="bidBox" style="display:none;">
-  <label>競標金額（元）</label>
-  <input id="bidAmount" type="text" placeholder="例如 80000">
-  <div class="hint">※ 多數競標金額落在 30,000 ～ 300,000 之間</div>
-  <div id="bidError" class="error" style="display:none;">請輸入競標金額</div>
-</div>
+      <div id="ccBlock">
+        <label>1｜排氣量（cc）</label>
+        <select id="cc">
+          <option value="251-500">251–500</option>
+          <option value="501-600">501–600</option>
+          <option value="601-1200">601–1200</option>
+          <option value="1201-1800" selected>1201–1800</option>
+          <option value="1801-2400">1801–2400</option>
+          <option value="2401-3000">2401–3000</option>
+          <option value="3001-3600">3001–3600</option>
+          <option value="3601-4200">3601–4200</option>
+          <option value="4201-4800">4201–4800</option>
+          <option value="4801-5400">4801–5400</option>
+          <option value="5401-6000">5401–6000</option>
+          <option value="6001-6600">6001–6600</option>
+          <option value="6601-7200">6601–7200</option>
+          <option value="7201-8000">7201–8000</option>
+          <option value="7801+">7801 以上（牌照稅用）</option>
+        </select>
+      </div>
 
-<button onclick="calc()">輸入資料，即算規費</button>
-<a id="shareBtn" class="btn" href="#">把結果傳給 Hauer 詢問</a>
+      <label>2｜燃料種類</label>
+      <select id="fuel">
+        <option value="gas" selected>汽油</option>
+        <option value="diesel">柴油</option>
+        <option value="ev">純電動</option>
+      </select>
 
-<div class="result">
-  <div class="big" id="total">—</div>
-  <div class="table" id="breakdown"></div>
-</div>
+      <div id="evNote" class="soft" style="display:none;">
+        <div class="muted">
+          你選的是「純電動」。本頁會先以 <b>牌照稅/燃料費 = 0</b> 估算；若政策或車種有例外，實際以政府/監理機關最新規定為準。你也可以把結果傳給我，我幫你核對。
+        </div>
+      </div>
 
-</div>
-</div>
+      <label>3｜計算期間</label>
+
+      <!-- 新領牌：整年 / 自選 -->
+      <div id="newPeriodBlock">
+        <div class="chips">
+          <label class="chip"><input type="radio" name="periodNew" value="full" checked> 整年</label>
+          <label class="chip"><input type="radio" name="periodNew" value="custom"> 自選日期</label>
+        </div>
+        <div class="row" id="dateRowNew" style="display:none;">
+          <div>
+            <label>起日</label>
+            <input id="startNew" type="date" />
+          </div>
+          <div>
+            <label>迄日</label>
+            <input id="endNew" type="date" />
+          </div>
+        </div>
+      </div>
+
+      <!-- 過戶/中古：用過戶日→到年底（可改） -->
+      <div id="transferPeriodBlock" style="display:none;">
+        <div class="muted" style="margin-top:8px;">
+          過戶/中古車建議：填「過戶日」，系統會預設算到「今年 12/31」（你也可自行調整）。
+        </div>
+        <div class="row" id="dateRowTransfer">
+          <div>
+            <label>過戶日（起日）</label>
+            <input id="startTransfer" type="date" />
+          </div>
+          <div>
+            <label>迄日（預設年底）</label>
+            <input id="endTransfer" type="date" />
+          </div>
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <label>4｜加選項目</label>
+      <div class="chips">
+        <label class="chip"><input id="pickno" type="checkbox"> 車牌自費選號（2,000）</label>
+      </div>
+
+      <button id="calcBtn">輸入資料，即算規費</button>
+      <a id="shareBtn" class="btn" href="#" target="_blank" rel="noopener">把結果傳給 Hauer 詢問</a>
+
+      <div class="result">
+        <div class="muted">試算金額（元）</div>
+        <div class="big" id="total">—</div>
+        <div class="table" id="breakdown">—</div>
+      </div>
+
+      <div class="hint">
+        ※ 本頁為估算工具。過戶/中古車若原車主已繳、或涉及退補稅差額，實際金額會不同；我可依車籍與辦理日期幫你核對。
+      </div>
+    </div>
+  </div>
 
 <script>
-const REG_FEE = 1250;
-const PICKNO_FEE = 2000;
+  const fmt = (n) => new Intl.NumberFormat('zh-Hant-TW').format(Math.round(n));
 
-const bidToggle = document.getElementById('bidToggle');
-const bidBox = document.getElementById('bidBox');
-const bidAmount = document.getElementById('bidAmount');
-const bidError = document.getElementById('bidError');
+  // 牌照稅（小客車 9人以下）年額：自用
+  const plateTaxSelf = {
+    "251-500":  1620,
+    "501-600":  2160,
+    "601-1200": 4320,
+    "1201-1800":7120,
+    "1801-2400":11230,
+    "2401-3000":15210,
+    "3001-4200":28220,
+    "4201-5400":46170,
+    "5401-6600":69690,
+    "6601-7800":117000,
+    "7801+":     151200
+  };
 
-bidToggle.addEventListener('change',()=>{
-  bidBox.style.display = bidToggle.checked ? 'block' : 'none';
-  bidError.style.display = 'none';
-});
+  // 燃料使用費（自用/年額）
+  const fuelFeeSelf = {
+    gas: {
+      "251-500":2160,"501-600":2880,"601-1200":4320,"1201-1800":4800,"1801-2400":6180,
+      "2401-3000":7200,"3001-3600":8640,"3601-4200":9810,"4201-4800":11220,"4801-5400":12180,
+      "5401-6000":13080,"6001-6600":13950,"6601-7200":14910,"7201-8000":15720
+    },
+    diesel: {
+      "251-500":1296,"501-600":1728,"601-1200":2592,"1201-1800":2880,"1801-2400":3708,
+      "2401-3000":4320,"3001-3600":5184,"3601-4200":5886,"4201-4800":6732,"4801-5400":7308,
+      "5401-6000":7848,"6001-6600":8370,"6601-7200":8946,"7201-8000":9432
+    }
+  };
 
-bidAmount.addEventListener('input',()=>{
-  const v = bidAmount.value.replace(/[^\d]/g,'');
-  bidAmount.value = v ? Number(v).toLocaleString() : '';
-});
+  // 固定費用（要改數字就改這裡）
+  const REG_FEE = 1250;
+  const PICKNO_FEE = 2000;
 
-function calc(){
-  let total = REG_FEE;
-  let rows = [['領牌規費',REG_FEE]];
-  let shareLines = [];
+  function daysBetween(a,b){
+    const ms = (new Date(b) - new Date(a));
+    return Math.max(0, Math.floor(ms / 86400000) + 1); // inclusive
+  }
+  function isLeapYear(y){ return (y%4===0 && (y%100!==0 || y%400===0)); }
 
-  if(document.getElementById('pickno').checked){
-    total += PICKNO_FEE;
-    rows.push(['車牌選號',PICKNO_FEE]);
+  function normalizeKeyForPlate(ccKey){
+    if(ccKey === "3001-3600" || ccKey === "3601-4200") return "3001-4200";
+    if(ccKey === "4201-4800" || ccKey === "4801-5400") return "4201-5400";
+    if(ccKey === "6001-6600") return "5401-6600";
+    if(ccKey === "6601-7200" || ccKey === "7201-8000") return "6601-7800";
+    return ccKey;
   }
 
-  if(bidToggle.checked){
-    const raw = bidAmount.value.replace(/[^\d]/g,'');
-    if(!raw){
-      bidError.style.display = 'block';
+  function getCaseType(){
+    return document.querySelector('input[name="caseType"]:checked').value; // new / transfer
+  }
+
+  function getRange(){
+    const caseType = getCaseType();
+
+    if(caseType === "new"){
+      const p = document.querySelector('input[name="periodNew"]:checked').value;
+      if(p === "full") return { mode:"full" };
+
+      const s = document.getElementById('startNew').value;
+      const e = document.getElementById('endNew').value;
+      if(!s || !e) return null;
+      return { mode:"custom", start:s, end:e };
+    }
+
+    // transfer
+    const s = document.getElementById('startTransfer').value;
+    const e = document.getElementById('endTransfer').value;
+    if(!s || !e) return null;
+    return { mode:"custom", start:s, end:e };
+  }
+
+  function proration(range){
+    if(range.mode === "full") return { factor:1, yearDays:365, days:365 };
+
+    const s = range.start;
+    const e = range.end;
+    const year = new Date(s).getFullYear();
+    const denom = isLeapYear(year) ? 366 : 365;
+    const d = daysBetween(s,e);
+    return { factor: Math.min(1, d/denom), yearDays:denom, days:d };
+  }
+
+  function setDefaultTransferDates(){
+    const now = new Date();
+    const y = now.getFullYear();
+    const mm = String(now.getMonth()+1).padStart(2,'0');
+    const dd = String(now.getDate()).padStart(2,'0');
+    const today = `${y}-${mm}-${dd}`;
+    const end = `${y}-12-31`;
+    document.getElementById('startTransfer').value = today;
+    document.getElementById('endTransfer').value = end;
+  }
+
+  function syncBlocks(){
+    const caseType = getCaseType();
+    document.getElementById('newPeriodBlock').style.display = (caseType==="new") ? "block" : "none";
+    document.getElementById('transferPeriodBlock').style.display = (caseType==="transfer") ? "block" : "none";
+    if(caseType==="transfer"){
+      if(!document.getElementById('startTransfer').value || !document.getElementById('endTransfer').value){
+        setDefaultTransferDates();
+      }
+    }
+  }
+
+  function syncNewDateRow(){
+    const p = document.querySelector('input[name="periodNew"]:checked').value;
+    document.getElementById('dateRowNew').style.display = (p==="custom") ? "grid" : "none";
+  }
+
+  function syncFuelUI(){
+    const fuel = document.getElementById('fuel').value;
+    const ccBlock = document.getElementById('ccBlock');
+    const ccSelect = document.getElementById('cc');
+    const evNote = document.getElementById('evNote');
+
+    if (fuel === "ev") {
+      ccSelect.disabled = true;
+      ccBlock.style.opacity = 0.5;
+      evNote.style.display = "block";
+    } else {
+      ccSelect.disabled = false;
+      ccBlock.style.opacity = 1;
+      evNote.style.display = "none";
+    }
+  }
+
+  function calc(){
+    const cc = document.getElementById('cc').value;
+    const fuel = document.getElementById('fuel').value;
+
+    const range = getRange();
+    if(!range){
+      alert("請把日期填完整（起日/迄日）");
       return;
     }
-    const bid = Number(raw);
-    total += bid;
-    rows.push(['號牌競標',bid]);
-    shareLines.push(`號牌競標金額：約 NT$ ${bid.toLocaleString()}`);
+
+    const pr = proration(range);
+
+    // 期間文字
+    const periodLabel = (range.mode==="full")
+      ? "整年"
+      : `${range.start} ～ ${range.end}（${pr.days}/${pr.yearDays} 天）`;
+
+    // 稅費計算
+    let plateYear = 0;
+    let fuelYear = 0;
+
+    if (fuel === "ev") {
+      // 純電動：此工具先以 0 估算（政策可能調整/有例外，實際以機關核定為準）
+      plateYear = 0;
+      fuelYear = 0;
+    } else {
+      const plateKey = (cc === "7801+") ? "7801+" : normalizeKeyForPlate(cc);
+      plateYear = plateTaxSelf[plateKey] ?? 0;
+      fuelYear = (fuelFeeSelf[fuel]?.[cc]) ?? 0;
+    }
+
+    const plate = plateYear * pr.factor;
+    const fuelFee = fuelYear * pr.factor;
+
+    const pickno = document.getElementById('pickno').checked ? PICKNO_FEE : 0;
+    const total = plate + fuelFee + REG_FEE + pickno;
+
+    // 顯示結果
+    document.getElementById('total').textContent = `NT$ ${fmt(total)}`;
+    document.getElementById('breakdown').innerHTML = `
+      <div><span>辦理類型</span><span>${getCaseType()==="new"?"新領牌/新車":"過戶/中古車"}</span></div>
+      <div><span>燃料種類</span><span>${fuel==="gas"?"汽油":fuel==="diesel"?"柴油":"純電動"}</span></div>
+      <div><span>計算期間</span><span>${periodLabel}</span></div>
+      <div><span>使用牌照稅</span><span>NT$ ${fmt(plate)}（年額 ${fmt(plateYear)}）</span></div>
+      <div><span>燃料使用費</span><span>NT$ ${fmt(fuelFee)}（年額 ${fmt(fuelYear)}）</span></div>
+      <div><span>領牌規費</span><span>NT$ ${fmt(REG_FEE)}</span></div>
+      <div><span>自費選號</span><span>NT$ ${fmt(pickno)}</span></div>
+    `;
+
+    // 分享文字
+    const msg =
+`我用「汽車規費試算」算了一下（自用小客車）：
+辦理類型：${getCaseType()==="new"?"新領牌/新車":"過戶/中古車"}
+燃料：${fuel==="gas"?"汽油":fuel==="diesel"?"柴油":"純電動"}
+排氣量：${fuel==="ev"?"（純電動不適用）":cc+" cc"}
+期間：${periodLabel}
+結果：總額約 NT$ ${fmt(total)}
+
+想請你幫我確認實際費用/是否有退補稅差額。`;
+
+    document.getElementById('shareBtn').href =
+      "https://social-plugins.line.me/lineit/share?text=" + encodeURIComponent(msg);
   }
 
-  document.getElementById('total').innerText = `NT$ ${total.toLocaleString()}`;
-  document.getElementById('breakdown').innerHTML =
-    rows.map(r=>`<div><span>${r[0]}</span><span>NT$ ${r[1].toLocaleString()}</span></div>`).join('');
+  // 事件綁定
+  document.getElementById('calcBtn').addEventListener('click', calc);
+  document.getElementById('fuel').addEventListener('change', syncFuelUI);
 
-  const msg =
-`我試算汽車規費：
-${shareLines.join('\n')}
-總額約 NT$ ${total.toLocaleString()}
-想請你幫我確認實際流程與可行性。`;
+  document.querySelectorAll('input[name="caseType"]').forEach(r => r.addEventListener('change', () => {
+    syncBlocks();
+    syncNewDateRow();
+  }));
+  document.querySelectorAll('input[name="periodNew"]').forEach(r => r.addEventListener('change', syncNewDateRow));
 
-  document.getElementById('shareBtn').href =
-    'https://social-plugins.line.me/lineit/share?text='+encodeURIComponent(msg);
-}
+  // 初始化
+  syncBlocks();
+  syncNewDateRow();
+  syncFuelUI();
 </script>
 </body>
 </html>
