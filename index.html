@@ -246,10 +246,33 @@
     }
   }
 
-  function syncNewDateRow(){
-    const p = document.querySelector('input[name="periodNew"]:checked').value;
-    document.getElementById('dateRowNew').style.display = (p==="custom") ? "grid" : "none";
+ function syncNewDateRow(){
+  const checked = document.querySelector('input[name="periodNew"]:checked');
+  if (!checked) return;
+
+  const show = (checked.value === "custom");
+  const row = document.getElementById('dateRowNew');
+  if (!row) return;
+
+  row.style.display = show ? "grid" : "none";
+
+  // ⭐ 自選日期時：起日=今天、迄日=今年12/31（只在空白時填，避免覆蓋使用者手動修改）
+  if (show) {
+    const now = new Date();
+    const y = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+
+    const today = `${y}-${mm}-${dd}`;
+    const yearEnd = `${y}-12-31`;
+
+    const startEl = document.getElementById('startNew');
+    const endEl = document.getElementById('endNew');
+
+    if (startEl && !startEl.value) startEl.value = today;
+    if (endEl && !endEl.value) endEl.value = yearEnd;
   }
+}
 
   function syncFuelUI(){
     const fuel = document.getElementById('fuel').value;
