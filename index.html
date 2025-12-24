@@ -343,26 +343,29 @@
 
     const plate = plateYear * pr.factor;
     const fuelFee = fuelYear * pr.factor;
-    // 加選項目
-// 加選項目
-const pickno = document.getElementById('pickno').checked ? PICKNO_FEE : 0;
-
-// 號牌競標（可為 0）
+    
+// 加選項目（二選一）
+let pickno = 0;
 let bidAmount = 0;
-const bidToggle = document.getElementById('bidToggle');
-const bidInput = document.getElementById('bidAmount');
-if (bidToggle && bidToggle.checked) {
-  bidAmount = Number((bidInput && bidInput.value) ? bidInput.value : 0);
+
+const addon = document.querySelector('input[name="addon"]:checked')?.value || 'none';
+
+if (addon === 'pickno') {
+  pickno = PICKNO_FEE;
 }
 
-// 防呆：勾選競標但沒填金額
-if (bidToggle && bidToggle.checked && bidAmount <= 0) {
-  alert("你勾選了號牌競標，請輸入競標金額");
-  return;
+if (addon === 'bid') {
+  const bidInput = document.getElementById('bidAmount');
+  bidAmount = Number((bidInput && bidInput.value) ? bidInput.value : 0);
+
+  // 防呆：選競標但沒填金額
+  if (bidAmount <= 0) {
+    alert("你選擇了號牌競標，請輸入競標金額");
+    return;
+  }
 }
 
 const total = plate + fuelFee + REG_FEE + pickno + bidAmount;
-
     // 顯示結果
     document.getElementById('total').textContent = `NT$ ${fmt(total)}`;
     document.getElementById('breakdown').innerHTML = `
