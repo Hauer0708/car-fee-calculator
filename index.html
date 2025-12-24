@@ -406,6 +406,16 @@ document.querySelectorAll('input[name="addon"]').forEach(radio => {
       (radio.value === 'bid' && radio.checked) ? 'block' : 'none';
   });
 });
+
+  // 初始化加選項目顯示狀態
+(() => {
+  const checked = document.querySelector('input[name="addon"]:checked');
+  const bidBox = document.getElementById('bidBox');
+  if (!checked || !bidBox) return;
+
+  bidBox.style.display =
+    (checked.value === 'bid') ? 'block' : 'none';
+})();
   
   document.querySelectorAll('input[name="caseType"]').forEach(r => r.addEventListener('change', () => {
     syncBlocks();
