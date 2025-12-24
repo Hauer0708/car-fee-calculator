@@ -39,12 +39,12 @@
       </div>
 
       <label>0｜辦理類型</label>
-<div class="chips">
-  <label class="chip">
-    <input type="radio" name="caseType" value="new" checked>
-    新領牌 / 一般車
-  </label>
-</div>
+      <div class="chips">
+        <label class="chip">
+          <input type="radio" name="caseType" value="new" checked>
+          新領牌 / 一般車
+        </label>
+      </div>
 
       <div id="ccBlock">
         <label>1｜排氣量（cc）</label>
@@ -100,7 +100,7 @@
         </div>
       </div>
 
-      <!-- 過戶/中古：用過戶日→到年底（可改） -->
+      <!-- 保留（目前不會顯示/不影響） -->
       <div id="transferPeriodBlock" style="display:none;">
         <div class="muted" style="margin-top:8px;">
           過戶/中古車建議：填「過戶日」，系統會預設算到「今年 12/31」（你也可自行調整）。
@@ -119,29 +119,29 @@
 
       <div class="sep"></div>
 
-<label>4｜加選項目</label>
-<div class="chips">
-  <label class="chip">
-    <input type="radio" name="addon" value="none" checked>
-    不加選項
-  </label>
+      <label>4｜加選項目</label>
+      <div class="chips">
+        <label class="chip">
+          <input type="radio" name="addon" value="none" checked>
+          不加選項
+        </label>
 
-  <label class="chip">
-    <input type="radio" name="addon" value="pickno">
-    車牌選號（+2,000）
-  </label>
+        <label class="chip">
+          <input type="radio" name="addon" value="pickno">
+          車牌選號（+2,000）
+        </label>
 
-  <label class="chip">
-    <input type="radio" name="addon" value="bid">
-    號牌競標
-  </label>
-</div>
+        <label class="chip">
+          <input type="radio" name="addon" value="bid">
+          號牌競標
+        </label>
+      </div>
 
-<div id="bidBox" class="soft" style="display:none;">
-  <label style="margin-top:0;">競標金額（元）</label>
-  <input id="bidAmount" type="number" inputmode="numeric" placeholder="自行輸入金額（例如 3,000）" />
-  <div class="hint" style="margin-top:6px;">※ 競標金額依個案不同，這裡先做加總估算</div>
-</div>
+      <div id="bidBox" class="soft" style="display:none;">
+        <label style="margin-top:0;">競標金額（元）</label>
+        <input id="bidAmount" type="number" inputmode="numeric" placeholder="自行輸入金額（例如 3,000）" />
+        <div class="hint" style="margin-top:6px;">※ 競標金額依個案不同，這裡先做加總估算</div>
+      </div>
 
       <button id="calcBtn">輸入資料，即算規費</button>
 
@@ -189,7 +189,7 @@
     }
   };
 
-  // 固定費用（要改數字就改這裡）
+  // 固定費用
   const REG_FEE = 1250;
   const PICKNO_FEE = 2000;
 
@@ -224,7 +224,7 @@
       return { mode:"custom", start:s, end:e };
     }
 
-    // transfer
+    // transfer（目前不會用到）
     const s = document.getElementById('startTransfer').value;
     const e = document.getElementById('endTransfer').value;
     if(!s || !e) return null;
@@ -264,33 +264,33 @@
     }
   }
 
- function syncNewDateRow(){
-  const checked = document.querySelector('input[name="periodNew"]:checked');
-  if (!checked) return;
+  function syncNewDateRow(){
+    const checked = document.querySelector('input[name="periodNew"]:checked');
+    if (!checked) return;
 
-  const show = (checked.value === "custom");
-  const row = document.getElementById('dateRowNew');
-  if (!row) return;
+    const show = (checked.value === "custom");
+    const row = document.getElementById('dateRowNew');
+    if (!row) return;
 
-  row.style.display = show ? "grid" : "none";
+    row.style.display = show ? "grid" : "none";
 
-  // ⭐ 自選日期時：起日=今天、迄日=今年12/31（只在空白時填，避免覆蓋使用者手動修改）
-  if (show) {
-    const now = new Date();
-    const y = now.getFullYear();
-    const mm = String(now.getMonth() + 1).padStart(2, '0');
-    const dd = String(now.getDate()).padStart(2, '0');
+    // 自選日期時：起日=今天、迄日=今年12/31（只在空白時填）
+    if (show) {
+      const now = new Date();
+      const y = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
 
-    const today = `${y}-${mm}-${dd}`;
-    const yearEnd = `${y}-12-31`;
+      const today = `${y}-${mm}-${dd}`;
+      const yearEnd = `${y}-12-31`;
 
-    const startEl = document.getElementById('startNew');
-    const endEl = document.getElementById('endNew');
+      const startEl = document.getElementById('startNew');
+      const endEl = document.getElementById('endNew');
 
-    if (startEl && !startEl.value) startEl.value = today;
-    if (endEl && !endEl.value) endEl.value = yearEnd;
+      if (startEl && !startEl.value) startEl.value = today;
+      if (endEl && !endEl.value) endEl.value = yearEnd;
+    }
   }
-}
 
   function syncFuelUI(){
     const fuel = document.getElementById('fuel').value;
@@ -312,9 +312,6 @@
   function calc(){
     const cc = document.getElementById('cc').value;
     const fuel = document.getElementById('fuel').value;
-      // 事件綁定
-  document.getElementById('calcBtn').addEventListener('click', calc);
-  document.getElementById('fuel').addEventListener('change', syncFuelUI);
 
     const range = getRange();
     if(!range){
@@ -324,17 +321,14 @@
 
     const pr = proration(range);
 
-    // 期間文字
     const periodLabel = (range.mode==="full")
       ? "整年"
       : `${range.start} ～ ${range.end}（${pr.days}/${pr.yearDays} 天）`;
 
-    // 稅費計算
     let plateYear = 0;
     let fuelYear = 0;
 
     if (fuel === "ev") {
-      // 純電動：此工具先以 0 估算（政策可能調整/有例外，實際以機關核定為準）
       plateYear = 0;
       fuelYear = 0;
     } else {
@@ -345,82 +339,75 @@
 
     const plate = plateYear * pr.factor;
     const fuelFee = fuelYear * pr.factor;
-    
-// 加選項目（二選一）
-let pickno = 0;
-let bidAmount = 0;
 
-const addon = document.querySelector('input[name="addon"]:checked')?.value || 'none';
+    // 加選項目（二選一）
+    let pickno = 0;
+    let bidAmount = 0;
 
-if (addon === 'pickno') {
-  pickno = PICKNO_FEE;
-}
+    const addon = document.querySelector('input[name="addon"]:checked')?.value || 'none';
 
-if (addon === 'bid') {
-  const bidInput = document.getElementById('bidAmount');
-  bidAmount = Number((bidInput && bidInput.value) ? bidInput.value : 0);
+    if (addon === 'pickno') {
+      pickno = PICKNO_FEE;
+    }
 
-  // 防呆：選競標但沒填金額
-  if (bidAmount <= 0) {
-    alert("你選擇了號牌競標，請輸入競標金額");
-    return;
-  }
-}
+    if (addon === 'bid') {
+      const bidInput = document.getElementById('bidAmount');
+      bidAmount = Number((bidInput && bidInput.value) ? bidInput.value : 0);
 
-const total = plate + fuelFee + REG_FEE + pickno + bidAmount;
-    // 顯示結果
+      if (bidAmount <= 0) {
+        alert("你選擇了號牌競標，請輸入競標金額");
+        return;
+      }
+    }
+
+    const total = plate + fuelFee + REG_FEE + pickno + bidAmount;
+
     document.getElementById('total').textContent = `NT$ ${fmt(total)}`;
     document.getElementById('breakdown').innerHTML = `
-      <div><span>辦理類型</span><span>${getCaseType()==="new"?"新領牌/新車":"過戶/中古車"}</span></div>
+      <div><span>辦理類型</span><span>${getCaseType()==="new"?"新領牌/一般車":"過戶/中古車"}</span></div>
       <div><span>燃料種類</span><span>${fuel==="gas"?"汽油":fuel==="diesel"?"柴油":"純電動"}</span></div>
       <div><span>計算期間</span><span>${periodLabel}</span></div>
       <div><span>使用牌照稅</span><span>NT$ ${fmt(plate)}（年額 ${fmt(plateYear)}）</span></div>
       <div><span>燃料使用費</span><span>NT$ ${fmt(fuelFee)}（年額 ${fmt(fuelYear)}）</span></div>
       <div><span>領牌規費</span><span>NT$ ${fmt(REG_FEE)}</span></div>
-      <div><span>自費選號</span><span>NT$ ${fmt(pickno)}</span></div>
+      <div><span>車牌選號</span><span>NT$ ${fmt(pickno)}</span></div>
       ${bidAmount > 0 ? `<div><span>號牌競標</span><span>NT$ ${fmt(bidAmount)}</span></div>` : ``}
     `;
+  } // ✅ calc() 結束
 
-    // 分享文字
-    const msg =
-`我用「汽車規費試算」算了一下（自用小客車）：
-辦理類型：${getCaseType()==="new"?"新領牌/新車":"過戶/中古車"}
-燃料：${fuel==="gas"?"汽油":fuel==="diesel"?"柴油":"純電動"}
-排氣量：${fuel==="ev"?"（純電動不適用）":cc+" cc"}
-期間：${periodLabel}
-號牌競標：${bidAmount > 0 ? `NT$ ${fmt(bidAmount)}` : `無`}
-結果：總額約 NT$ ${fmt(total)}
 
-想請你幫我確認實際費用/是否有退補稅差額。`;
+  // ✅ 事件綁定（只綁一次，放在 calc 外面）
+  document.getElementById('calcBtn').addEventListener('click', calc);
+  document.getElementById('fuel').addEventListener('change', syncFuelUI);
 
-// 加選項目（二選一）：顯示 / 隱藏競標金額
-document.querySelectorAll('input[name="addon"]').forEach(radio => {
-  radio.addEventListener('change', () => {
+  // ✅ 加選項目（二選一）：顯示 / 隱藏競標金額
+  document.querySelectorAll('input[name="addon"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      const bidBox = document.getElementById('bidBox');
+      if (!bidBox) return;
+
+      bidBox.style.display =
+        (radio.value === 'bid' && radio.checked) ? 'block' : 'none';
+    });
+  });
+
+  // ✅ 初始化加選項目顯示狀態
+  (() => {
+    const checked = document.querySelector('input[name="addon"]:checked');
     const bidBox = document.getElementById('bidBox');
-    if (!bidBox) return;
+    if (!checked || !bidBox) return;
 
     bidBox.style.display =
-      (radio.value === 'bid' && radio.checked) ? 'block' : 'none';
-  });
-});
+      (checked.value === 'bid') ? 'block' : 'none';
+  })();
 
-  // 初始化加選項目顯示狀態
-(() => {
-  const checked = document.querySelector('input[name="addon"]:checked');
-  const bidBox = document.getElementById('bidBox');
-  if (!checked || !bidBox) return;
-
-  bidBox.style.display =
-    (checked.value === 'bid') ? 'block' : 'none';
-})();
-  
   document.querySelectorAll('input[name="caseType"]').forEach(r => r.addEventListener('change', () => {
     syncBlocks();
     syncNewDateRow();
   }));
   document.querySelectorAll('input[name="periodNew"]').forEach(r => r.addEventListener('change', syncNewDateRow));
 
-  // 初始化
+  // ✅ 初始化
   syncBlocks();
   syncNewDateRow();
   syncFuelUI();
